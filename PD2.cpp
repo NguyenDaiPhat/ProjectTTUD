@@ -19,20 +19,10 @@ struct Point // định nghĩa một địa điểm gồm tọa độ x và y
     }
 };
 
-struct Order // định nghĩa một đơn hàng gồm điểm nhận, điểm trả và cân nặng
-{
-    Point pointPickUp;
-    Point pointDelivery;
-    double weight;
-    void setOrder(Point pointPickUp, Point pointDelivery, double weight)
-    {
-        this->pointDelivery.setXY(pointPickUp.x, pointPickUp.y);
-        this->pointDelivery.setXY(pointDelivery.x, pointDelivery.y);
-        this->weight = weight;
-    }
-};
-
-void input(int &n, double &w, vector<Point> &points, vector<Order> &orders) // lấy dữ liệu đầu vào gồm số lượng, cân nặng và đơn hàng từ file input
+void Input(int &n, double &w, vector<Point> &points, vector<double> &weights, vector<vector<double>> &distances)
+// lấy dữ liệu đầu vào gồm số lượng, cân nặng và đơn hàng từ file input
+// thêm dữ liệu vào n, w, vector point, weight
+// tính khoảng cách giữa các điểm và thêm vào ma trận distances
 {
     ifstream inFile;
     inFile.open("C:/Users/admin/Desktop/ProjectTTUD/input/input1.csv");
@@ -63,19 +53,26 @@ void input(int &n, double &w, vector<Point> &points, vector<Order> &orders) // l
         getline(iss, s, ',');
         weight = stod(s);
         Point pointPickUp;
-        pointPickUp.setXY(x1,y1);
+        pointPickUp.setXY(x1, y1);
         points.push_back(pointPickUp);
         Point pointDelivery;
         pointDelivery.setXY(x2, y2);
         points.push_back(pointDelivery);
-        Order order;
-        order.setOrder(pointPickUp, pointDelivery, weight);
-        orders.push_back(order);
+        weights.push_back(weight);
+    }
+    for (int i = 0; i < 2 * n; i++)
+    {
+        vector<double> pointJ;
+        for (int j = 0; j < 2 * n; j++)
+        {
+            pointJ.push_back(points[i].distance(points[j]));
+        }
+        distances.push_back(pointJ);
     }
     inFile.close();
 }
 
-void output(vector<Point> points) // đẩy dữ diệu đầu ra là một vector chứa các địa điểm biểu diễn đường đi của shipper vô file output
+void Output(vector<Point> pointsOutput) // đẩy dữ diệu đầu ra là một vector chứa các địa điểm biểu diễn đường đi của shipper vô file output
 {
     ofstream outFile;
     outFile.open("C:/Users/admin/Desktop/ProjectTTUD/output/output.csv");
@@ -84,9 +81,9 @@ void output(vector<Point> points) // đẩy dữ diệu đầu ra là một vect
         cout << "Fail to open file output !!!";
         exit(0);
     }
-    for (int i = 0; i < points.size(); i++)
+    for (int i = 0; i < pointsOutput.size(); i++)
     {
-        outFile << points[i].x << "," << points[i].y << endl;
+        outFile << pointsOutput[i].x << "," << pointsOutput[i].y << endl;
     }
     outFile.close();
 }
@@ -96,22 +93,16 @@ int main(int argc, char *agrv[])
 
     int n;                            // số lượng đơn hàng
     double w;                         // trọng lượng đơn hàng
-    vector<Order> orders;             // vector chứa tất cả các đơn hàng
-    vector<Point> points;
-    vector<vector<double>> distances; // vector lồng (ma trận) chứa khoảng cách của các điểm
-    vector<Point> pointsOutput;             // vector chứa các địa điểm biểu diễn đường đi của shipper
-    input(n, w, points, orders);
-    for (int i = 0; i < n; i++)
-    {
-        for (int j = 0; j < n; j++)
-        {
+    vector<double> weights;           // vector chứa trọng lượng của n đơn hàng
+    vector<Point> points;             // vector chứa tất cả các địa điểm, điểm nhận có chỉ số chẵn, điểm trả có chỉ số lẻ
+    vector<vector<double>> distances; // vector lồng (ma trận) chứa khoảng cách của các điểm. Ví dụ distanceses[0][1] là khoảng cách điểm 0 tới điểm 1
+    vector<Point> pointsOutput;       // vector chứa các địa điểm biểu diễn đường đi của shipper
+    Input(n, w, points, weights, distances);
 
-        }
-    }
-    for (int i = 0; i < 2*n; i++) // test output
-    {
-        pointsOutput.push_back(points[i]);
-    }
-    output(pointsOutput);
+    // for (int i = 0; i < 2 * n; i++) // test output
+    // {
+    //     pointsOutput.push_back(points[i]);
+    // }
+    // Output(pointsOutput);
     return 0;
 }
