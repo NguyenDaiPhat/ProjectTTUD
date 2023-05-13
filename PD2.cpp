@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 using namespace std;
+
 struct Point // định nghĩa một địa điểm gồm tọa độ x và y
 {
     double x;
@@ -27,6 +28,7 @@ vector<vector<double>> distances;       // vector lồng (ma trận) chứa kho�
 vector<int> pointsOutput;               // vector chứa các chỉ mục địa điểm biểu diễn đường đi của shipper
 vector<bool> visited(2 * n + 1, false); // vector đánh dấu các địa điểm đã được đi qua hay chưa
 double totalWeight = 0;                 // tổng trọng lượng đơn hàng mà shipper đang mang đi
+
 void input()
 // lấy dữ liệu đầu vào gồm số lượng, cân nặng và đơn hàng từ file input
 // thêm dữ liệu vào n, w, vector point, weight
@@ -102,7 +104,7 @@ void output()
     outFile.close();
 }
 
-int findNearest(int curr)
+int findNearest(int curr) 
 {
     int nearest = -1;
     double minDistance = 1e9;
@@ -110,15 +112,7 @@ int findNearest(int curr)
     {
         if (!visited[i] && distances[curr][i] < minDistance)
         {
-            if (i % 2 == 1)
-            {
-                if (totalWeight + weights[i / 2] <= w)
-                {
-                    nearest = i;
-                    minDistance = distances[curr][i];
-                }
-            }
-            else if (visited[i - 1])
+            if ((i % 2 == 1 && totalWeight + weights[i / 2] <= w) || (i % 2 == 0 && visited[i - 1]))
             {
                 nearest = i;
                 minDistance = distances[curr][i];
@@ -130,17 +124,17 @@ int findNearest(int curr)
     return nearest;
 }
 
-void nearestNeighbor()
+void nearestNeighbor() // hàm này dùng thuật toán heuristic (Nearest Neighbor)
 {
     visited[0] = true;
     int curr = 0;
     for (int i = 0; i < 2 * n + 1; i++)
     {
-        // if (findNearest(curr) != 0)
-        // {
         int next = findNearest(curr);
-        if (next == -1)
+        if (next == -1){
+            pointsOutput.push_back(0);
             break;
+        }
         else if (next % 2 == 1)
             totalWeight += weights[next / 2];
         else
@@ -148,15 +142,15 @@ void nearestNeighbor()
         visited[next] = true;
         pointsOutput.push_back(next);
         curr = next;
-        // }
     }
 }
+
 
 int main(int argc, char *agrv[])
 {
     input();
-    nearestNeighbor();
-
+    nearestNeighbor(); // tạo một lời giải ban đầu 
+    
     output();
     // for (int i = 0; i < 2 * n; i++) // test output
     // {

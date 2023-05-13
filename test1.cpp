@@ -49,8 +49,10 @@ void localSearch(int *path)
         {
             for (int j = i + 1; j <= n; ++j)
             {
-                int distDiff = a[path[i - 1]][path[j]] + a[path[i]][path[j + 1]] -
-                               a[path[i - 1]][path[i]] - a[path[j]][path[j + 1]];
+                int new1 = a[path[i - 1]][path[j]] + a[path[i]][path[j + 1]];
+                int old1 = a[path[i - 1]][path[i]] + a[path[j]][path[j + 1]];
+                int distDiff = new1 - old1; // new
+                                            // old
                 if (distDiff < 0)
                 {
                     reverse(path + i, path + j + 1);
@@ -80,6 +82,6 @@ int main()
     for (int i = 1; i <= n; ++i)
         cout << path[i] << " ";
     cout << endl;
-
+    cout << path[0];
     return 0;
 }
