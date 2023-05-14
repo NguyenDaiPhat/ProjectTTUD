@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
 using namespace std;
 
 struct Point // định nghĩa một địa điểm gồm tọa độ x và y
@@ -104,7 +105,7 @@ void output()
     outFile.close();
 }
 
-int findNearest(int curr) 
+int findNearest(int curr)
 {
     int nearest = -1;
     double minDistance = 1e9;
@@ -131,7 +132,8 @@ void nearestNeighbor() // hàm này dùng thuật toán heuristic (Nearest Neigh
     for (int i = 0; i < 2 * n + 1; i++)
     {
         int next = findNearest(curr);
-        if (next == -1){
+        if (next == -1)
+        {
             pointsOutput.push_back(0);
             break;
         }
@@ -145,12 +147,50 @@ void nearestNeighbor() // hàm này dùng thuật toán heuristic (Nearest Neigh
     }
 }
 
+void localsearch(int a, int b) // phương pháp localsearch 2-opt
+{
+    bool improved = true;
+    while (improved)
+    {
+        improved = false;
+        for (int i = a; i <= b; ++i)
+        {
+            for (int j = a + 1; j <= b; ++j)
+            {
+                int new1 = distances[pointsOutput[i - 1]][pointsOutput[j]] + distances[pointsOutput[i]][pointsOutput[j + 1]];
+                int old1 = distances[pointsOutput[i - 1]][pointsOutput[i]] + distances[pointsOutput[j]][pointsOutput[j + 1]];
+                int distDiff = new1 - old1;
+                if (distDiff < 0)
+                {
+                    reverse(pointsOutput.begin() + i, pointsOutput.begin() + j + 1);
+                    improved = true;
+                }
+            }
+        }
+    }
+}
+
+void optimization()
+{
+    int i = 1;
+    while (i < pointsOutput.size() - 2)
+    {
+        int j = i + 1;
+        while ((j < pointsOutput.size() - 1) && (i % 2 == j % 2))
+        {
+            j++;
+        }
+        localsearch(i, j - 1);
+        i = j - 1;
+        i++;
+    }
+}
 
 int main(int argc, char *agrv[])
 {
     input();
-    nearestNeighbor(); // tạo một lời giải ban đầu 
-    
+    nearestNeighbor(); // tạo một lời giải ban đầu
+    optimization();    // tối ưu lời giải ban đầu
     output();
     // for (int i = 0; i < 2 * n; i++) // test output
     // {
