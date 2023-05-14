@@ -1,6 +1,5 @@
 # ProjectTTUD
-gỉt clone trên deskop "C:/Users/admin/Desktop"
-## Run code
-g++ PD2.cpp -o a
-./a
+### 1. gỉt clone trên deskop "C:/Users/admin/Desktop"
+### 2. g++ PD2.cpp -o a 
+### 3. ./a
 
