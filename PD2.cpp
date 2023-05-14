@@ -99,8 +99,12 @@ void output()
     }
     for (int i = 0; i < pointsOutput.size(); i++)
     {
-        // outFile << points[pointsOutput[i]].x << "," << points[pointsOutput[i]].y << endl;
         outFile << pointsOutput[i] << " ";
+    }
+    outFile << endl;
+    for (int i = 0; i < pointsOutput.size(); i++)
+    {
+        outFile << points[pointsOutput[i]].x << "," << points[pointsOutput[i]].y << endl;
     }
     outFile.close();
 }
