@@ -192,33 +192,5 @@ int main(int argc, char *agrv[])
     nearestNeighbor(); // tạo một lời giải ban đầu
     optimization();    // tối ưu lời giải ban đầu
     output();
-    // for (int i = 0; i < 2 * n; i++) // test output
-    // {
-    //     pointsOutput.push_back(points[i]);
-    // }
-    // for (int i = 0; i < 2 * n; i++) // test output
-    // {
-    //     // pointsOutput.push_back(points[i]);
-    //     cout << pointsOutput[i].status;
-    // }
-    // output(pointsOutput);
-
-    // for (int i = 0; i < 2 * n + 1; i++)
-    // {
-    //     for (int j = 0; j < 2 * n + 1; j++)
-    //     {
-    //         cout << distances[i][j] << " ";
-    //     }
-    //     cout << endl;
-    // }
-    // for (int i = 0; i < weights.size(); i++)
-    // {
-    //     cout << weights[i] << " ";
-    // }
-    // for(int i = 0; i<points.size(); i++){
-    //     cout<< points[i].x<<" "<< points[i].y;
-    //     cout<<endl;
-    // }
-
     return 0;
 }
