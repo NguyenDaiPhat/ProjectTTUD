@@ -98,22 +98,22 @@ void output()
         cout << "Fail to open file output !!!";
         exit(0);
     }
-    outFile << "Lo trinh: ";
-    for (int i = 0; i < pointsOutput.size(); i++)
-    {
-        outFile << pointsOutput[i] << " ";
-        if (i < pointsOutput.size() - 1)
-           {
-            totalDistance += distances[pointsOutput[i]][pointsOutput[i+1]];
-            // cout << distances[pointsOutput[i]][pointsOutput[i + 1]] << endl;
-           } 
-    }
-    outFile << endl <<"Tong quang duong: "<< totalDistance << endl;
+    // outFile << "Lo trinh: ";
     // for (int i = 0; i < pointsOutput.size(); i++)
     // {
-    //     outFile << points[pointsOutput[i]].x << "," << points[pointsOutput[i]].y << endl;
+    //     outFile << pointsOutput[i] << " ";
+    //     if (i < pointsOutput.size() - 1)
+    //        {
+    //         totalDistance += distances[pointsOutput[i]][pointsOutput[i+1]];
+    //         // cout << distances[pointsOutput[i]][pointsOutput[i + 1]] << endl;
+    //        } 
     // }
-    // outFile.close();
+    // outFile << endl <<"Tong quang duong: "<< totalDistance << endl;
+    for (int i = 0; i < pointsOutput.size(); i++)
+    {
+        outFile << points[pointsOutput[i]].x << "," << points[pointsOutput[i]].y << endl;
+    }
+    outFile.close();
 }
 
 int findNearest(int curr)
@@ -187,7 +187,7 @@ void optimization()
     while (i < pointsOutput.size() - 2)
     {
         int j = i + 1;
-        while ((j < pointsOutput.size() - 1) && (i % 2 == j % 2))
+        while ((j < pointsOutput.size() - 1) && (pointsOutput[i] % 2 == pointsOutput[j] % 2))
         {
             j++;
         }
