@@ -21,10 +21,12 @@ struct Point // định nghĩa một địa điểm gồm tọa độ x và y
     }
 };
 
-int n;                                  // số lượng đơn hàng
-double w;                               // trọng lượng đơn hàng tối đa mà shipper có thể mang
-vector<double> weights;                 // vector chứa trọng lượng của n đơn hàng
-vector<Point> points;                   // vector chứa 2*n các địa điểm, điểm nhận có chỉ số lẻ, điểm trả có chỉ số chẵn
+int n;                  // số lượng đơn hàng
+double w;               // trọng lượng đơn hàng tối đa mà shipper có thể mang
+vector<double> weights; // vector chứa trọng lượng của n đơn hàng
+vector<Point> points;   // vector chứa 2*n các địa điểm, điểm nhận có chỉ số lẻ, điểm trả có chỉ số chẵn
+// points[0] {0,0}
+// ponits[1] {}
 vector<vector<double>> distances;       // vector lồng (ma trận) chứa khoảng cách của các điểm. Ví dụ distanceses[0][1] = distanceses[1][0] là khoảng cách điểm 0 tới điểm 1
 vector<int> pointsOutput;               // vector chứa các chỉ mục địa điểm biểu diễn đường đi của shipper
 vector<bool> visited(2 * n + 1, false); // vector đánh dấu các địa điểm đã được đi qua hay chưa
@@ -36,7 +38,7 @@ void input()
 // tính khoảng cách giữa các điểm và thêm vào ma trận distances
 {
     ifstream inFile;
-    inFile.open("C:/Users/admin/Desktop/ProjectTTUD/input/input1.csv");
+    inFile.open("C:/Users/admin/Desktop/ProjectTTUD/input/input2.csv");
     if (!inFile.is_open())
     {
         cout << "Fail to open file input !!!";
@@ -90,7 +92,7 @@ void input()
 void output()
 // đẩy dữ diệu đầu ra là một vector chứa các địa điểm biểu diễn đường đi của shipper vô file output
 {
-    double totalDistance = 0; // tổng quãng đường di chuyển của shipper
+    // double totalDistance = 0; // tổng quãng đường di chuyển của shipper
     ofstream outFile;
     outFile.open("C:/Users/admin/Desktop/ProjectTTUD/output/output.csv");
     if (!outFile.is_open())
@@ -103,17 +105,33 @@ void output()
     // {
     //     outFile << pointsOutput[i] << " ";
     //     if (i < pointsOutput.size() - 1)
-    //        {
-    //         totalDistance += distances[pointsOutput[i]][pointsOutput[i+1]];
+    //     {
+    //         totalDistance += distances[pointsOutput[i]][pointsOutput[i + 1]];
     //         // cout << distances[pointsOutput[i]][pointsOutput[i + 1]] << endl;
-    //        } 
+    //     }
     // }
-    // outFile << endl <<"Tong quang duong: "<< totalDistance << endl;
+    // outFile << endl
+    //         << "Tong quang duong: " << totalDistance << endl;
     for (int i = 0; i < pointsOutput.size(); i++)
     {
         outFile << points[pointsOutput[i]].x << "," << points[pointsOutput[i]].y << endl;
     }
     outFile.close();
+}
+
+void showOutput(){
+    double totalDistance = 0; // tổng quãng đường di chuyển của shipper
+    cout << "Lo trinh: ";
+    for (int i = 0; i < pointsOutput.size(); i++)
+    {
+        cout << pointsOutput[i] << " ";
+        if (i < pointsOutput.size() - 1)
+        {
+            totalDistance += distances[pointsOutput[i]][pointsOutput[i + 1]];
+            // cout << distances[pointsOutput[i]][pointsOutput[i + 1]] << endl;
+        }
+    }
+    cout << endl << "Tong quang duong: " << totalDistance << endl<<endl;
 }
 
 int findNearest(int curr)
@@ -150,6 +168,7 @@ void nearestNeighbor() // hàm này dùng thuật toán heuristic (Nearest Neigh
         }
         else if (next % 2 == 1)
             totalWeight += weights[next / 2];
+
         else
             totalWeight -= weights[(next - 1) / 2];
         visited[next] = true;
@@ -164,22 +183,31 @@ void localsearch(int a, int b) // phương pháp localsearch 2-opt
     while (improved)
     {
         improved = false;
-        for (int i = a; i <= b; ++i)
+        for (int i = a; i < b; i++)
         {
-            for (int j = a + 1; j <= b; ++j)
+            for (int j = i + 1; j < b; j++)
             {
-                int new1 = distances[pointsOutput[i - 1]][pointsOutput[j]] + distances[pointsOutput[i]][pointsOutput[j + 1]];
-                int old1 = distances[pointsOutput[i - 1]][pointsOutput[i]] + distances[pointsOutput[j]][pointsOutput[j + 1]];
-                int distDiff = new1 - old1;
+                double new1 = distances[pointsOutput[i - 1]][pointsOutput[j]] + distances[pointsOutput[i]][pointsOutput[j + 1]];
+                double old1 = distances[pointsOutput[i - 1]][pointsOutput[i]] + distances[pointsOutput[j]][pointsOutput[j + 1]];
+                double distDiff = new1 - old1;
+                // cout<<endl;
+                // cout << distDiff << " "<<endl;
+                // cout<< i<<" "<<j<<endl;
                 if (distDiff < 0)
                 {
                     reverse(pointsOutput.begin() + i, pointsOutput.begin() + j + 1);
                     improved = true;
+                    // cout << distDiff<<" ";
                 }
+                // for (int i : pointsOutput)
+                //     cout << i << " ";
+                // cout << endl;
             }
         }
     }
 }
+
+// pointOuput{}
 
 void optimization()
 {
@@ -191,17 +219,25 @@ void optimization()
         {
             j++;
         }
-        localsearch(i, j - 1);
+        if (i < j - 1)
+            localsearch(i, j);
         i = j - 1;
         i++;
     }
+    // for (int i = 1; i < pointsOutput.size() - 3; i++)
+    //     for (int j = i + 1; j < pointsOutput.size() - 2; j++)
+    //     {
+    //         if ((pointsOutput[i] % 2 != pointsOutput[j] % 2) && (i != j-1)){
+    //             localsearch(i, j - 1);
+    //         }
+    //     }
 }
 
 int main(int argc, char *agrv[])
 {
     input();
     nearestNeighbor(); // tạo một lời giải ban đầu
-    // output();
+    showOutput();
     optimization();    // tối ưu lời giải ban đầu
     // for (int i = 0; i < 2 * n + 1; i++)
     // {
@@ -211,6 +247,7 @@ int main(int argc, char *agrv[])
     //     }
     //     cout << endl;
     // }
+    showOutput();
     output();
     return 0;
 }
