@@ -89,12 +89,13 @@ void input()
     inFile.close();
 }
 
-void output()
+void output(string file)
 // đẩy dữ diệu đầu ra là một vector chứa các địa điểm biểu diễn đường đi của shipper vô file output
 {
     // double totalDistance = 0; // tổng quãng đường di chuyển của shipper
     ofstream outFile;
-    outFile.open("C:/Users/admin/Desktop/ProjectTTUD/output/output.csv");
+
+    outFile.open(file);
     if (!outFile.is_open())
     {
         cout << "Fail to open file output !!!";
@@ -238,7 +239,8 @@ int main(int argc, char *agrv[])
     input();
     nearestNeighbor(); // tạo một lời giải ban đầu
     showOutput();
-    optimization();    // tối ưu lời giải ban đầu
+    output("C:/Users/admin/Desktop/ProjectTTUD/output/outputGen.csv");
+        optimization(); // tối ưu lời giải ban đầu
     // for (int i = 0; i < 2 * n + 1; i++)
     // {
     //     for (int j = 0; j < 2 * n + 1; j++)
@@ -248,6 +250,6 @@ int main(int argc, char *agrv[])
     //     cout << endl;
     // }
     showOutput();
-    output();
+    output("C:/Users/admin/Desktop/ProjectTTUD/output/outputOp.csv");
     return 0;
 }
