@@ -38,7 +38,7 @@ void input()
 // tính khoảng cách giữa các điểm và thêm vào ma trận distances
 {
     ifstream inFile;
-    inFile.open("C:/Users/admin/Desktop/ProjectTTUD/input/input2.csv");
+    inFile.open("C:/Users/admin/Desktop/ProjectTTUD/input/input1.csv");
     if (!inFile.is_open())
     {
         cout << "Fail to open file input !!!";
@@ -113,17 +113,18 @@ void output(string file)
     // }
     // outFile << endl
     //         << "Tong quang duong: " << totalDistance << endl;
-    for (int i = 0; i < pointsOutput.size(); i++)
+    for (int i = 0; i < pointsOutput.size()-1; i++)
     {
         outFile << points[pointsOutput[i]].x << "," << points[pointsOutput[i]].y << endl;
     }
     outFile.close();
 }
 
-void showOutput(){
+void showOutput()
+{
     double totalDistance = 0; // tổng quãng đường di chuyển của shipper
     cout << "Lo trinh: ";
-    for (int i = 0; i < pointsOutput.size(); i++)
+    for (int i = 0; i < pointsOutput.size()-1; i++)
     {
         cout << pointsOutput[i] << " ";
         if (i < pointsOutput.size() - 1)
@@ -132,7 +133,9 @@ void showOutput(){
             // cout << distances[pointsOutput[i]][pointsOutput[i + 1]] << endl;
         }
     }
-    cout << endl << "Tong quang duong: " << totalDistance << endl<<endl;
+    cout << endl
+         << "Tong quang duong: " << totalDistance << endl
+         << endl;
 }
 
 int findNearest(int curr)
@@ -240,7 +243,7 @@ int main(int argc, char *agrv[])
     nearestNeighbor(); // tạo một lời giải ban đầu
     showOutput();
     output("C:/Users/admin/Desktop/ProjectTTUD/output/outputGen.csv");
-        optimization(); // tối ưu lời giải ban đầu
+    optimization(); // tối ưu lời giải ban đầu
     // for (int i = 0; i < 2 * n + 1; i++)
     // {
     //     for (int j = 0; j < 2 * n + 1; j++)
