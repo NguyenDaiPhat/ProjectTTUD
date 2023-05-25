@@ -56,7 +56,7 @@ struct Input
         pointStart.setXY(0, 0);
         points.push_back(pointStart);
         pointsOutput.push_back(0);
-
+        weights.push_back(0);
         while (getline(inFile, line))
         {
             istringstream iss(line);
@@ -81,6 +81,7 @@ struct Input
             points.push_back(pointDelivery);
 
             weights.push_back(weight);
+            weights.push_back((-1) * weight);
         }
 
         visited.resize(2 * n + 1, false);
@@ -154,11 +155,11 @@ struct Solution
     {
         int nearest = -1;
         double minDistance = 1e9;
-        for (int i = 0; i < 2 * input.n + 1; i++)
+        for (int i = 1; i < 2 * input.n + 1; i++)
         {
             if (!input.visited[i] && input.distances[curr][i] < minDistance)
             {
-                if ((i % 2 == 1 && input.totalWeight + input.weights[i / 2] <= input.w) || (i % 2 == 0 && input.visited[i - 1]))
+                if ((i % 2 == 1 && input.totalWeight + input.weights[i] <= input.w) || (i % 2 == 0 && input.visited[i - 1]))
                 {
                     nearest = i;
                     minDistance = input.distances[curr][i];
@@ -173,24 +174,19 @@ struct Solution
         input.visited[0] = true;
         int curr = 0;
         input.w_points.resize(2 * input.n + 1);
-        for (int i = 0; i < 2 * input.n + 1; i++)
+        for (int i = 1; i < 2 * input.n + 1; i++)
         {
             int next = findNearest(input, curr);
             if (next == -1)
             {
                 input.pointsOutput.push_back(0);
-                cout << input.totalWeight << "\n";
+                // cout << input.totalWeight << "\n";
                 break;
-            }
-            else if (next % 2 == 1)
-            {
-                input.totalWeight += input.weights[next / 2];
-                input.w_points[i] = input.totalWeight;
             }
             else
             {
-                input.totalWeight -= input.weights[(next - 1) / 2];
-                input.w_points[i] = input.totalWeight * -1;
+                input.totalWeight += input.weights[next];
+                input.w_points[i] = input.totalWeight;
             }
             input.visited[next] = true;
             input.pointsOutput.push_back(next);
@@ -324,7 +320,7 @@ struct Solution
                     }
                 }
             }
-            if (improved)
+            if (best_swap1 != -1)
             {
                 swap(input.pointsOutput[best_swap1], input.pointsOutput[best_swap2]);
                 input.totalDistance = best_dis;
@@ -332,12 +328,12 @@ struct Solution
         }
     }
 
-    bool checkRel(Input &input, vector<int> &clone, int a, int b, int category)
+    bool checkRel(Input &input, vector<int> &clone, int a, int b, int c, int category, double oldDis)
     {
         vector<double> w_pointsClone;
         double newDis;
         // check vi tri
-        if (category == 0 && clone[b] % 2 == 1)
+        if (category == 0 && clone[c] % 2 == 1)
         {
             for (int i = b; i > a; i--)
             {
@@ -345,7 +341,7 @@ struct Solution
                     return false;
             }
         }
-        if (category == 1 && clone[a] % 2 == 0)
+        if (category == 1 && clone[c] % 2 == 0)
         {
             for (int i = a; i < b; i++)
             {
@@ -355,6 +351,7 @@ struct Solution
                 }
             }
         }
+
         // check w
         double total = 0;
         w_pointsClone.push_back(0);
@@ -376,80 +373,115 @@ struct Solution
             if (w_pointsClone[i] > input.w)
                 return false;
         }
+
+        // check better
+        if (category == 0)
+        {
+            newDis = input.distances[clone[a - 1]][clone[a]] + input.distances[clone[b]][clone[b + 1]] + input.distances[clone[b - 1]][clone[b]];
+        }
+        else
+        {
+            newDis = input.distances[clone[a - 1]][clone[a]] + input.distances[clone[a]][clone[a + 1]] + input.distances[clone[b]][clone[b + 1]];
+        }
+        if (oldDis < newDis)
+        {
+            return false;
+        }
         return true;
     }
 
+    //  7
+    //  0 3 5 7  4  3  7 5
+    //  0 3 2 2 -3 -1  4 -2
+    //        j        i
+    //  0 3 2 4  2 -3 -1 -2
+    //  0 3 5 9  11 8  7  5
+
     void Relocate(Input &input)
     {
+        int a, b, category; // category == 1 : relocate về phía trước, category ==0 relocate về phía sau
         bool improved = true;
         while (improved)
         {
             improved = false;
-            vector<int> best_clone;
-            double best_dis = 999999999, Dis;
-            int a, b, c, category; // category == 1 : relocate về phía trước, category ==0 relocate về phía sau
             for (int i = 1; i < 2 * input.n + 1; i++)
             {
                 for (int j = 1; j < 2 * input.n + 1; j++)
                 {
                     if (i != j && i + 1 != j && i - 1 != j)
                     {
-                        vector<int> clone(input.pointsOutput.begin(), input.pointsOutput.end());
+                        // vector<int> clone(input.pointsOutput.begin(), input.pointsOutput.end());
                         if (i < j)
                         {
-                            a = i;
-                            b = j;
-                            category = 0; // relocate từ trước ra sau
-                            for (int k = a; k < b; k++)
+                            if (input.pointsOutput[i] % 2 == 0)
                             {
-                                clone[k] = clone[k + 1];
+                                for (int k = i; k < j; k++)
+                                {
+                                    if (input.w_points[k] + input.weights[input.pointsOutput[k + 1]] - input.weights[input.pointsOutput[i]] > w)
+                                    {
+                                        // TODO false
+                                    }
+                                }
                             }
-                            clone[j] = input.pointsOutput[i];
+                            else
+                            {
+                                for (int k = i + 1; k <= j; k++)
+                                {
+                                    if (input.pointsOutput[k] == input.pointsOutput[i] + 1)
+                                    {
+                                        // TODO false
+                                    }
+                                }
+                            }
+                            // a = i;
+                            // b = j;
+                            // c = b;        // vị trí mới sau khi relocate
+                            // category = 0; // relocate từ trước ra sau
+                            // for (int k = a; k < b; k++)
+                            // {
+                            //     clone[k] = clone[k + 1];
+                            // }
+                            // clone[j] = input.pointsOutput[i];
                         }
                         else
                         {
-                            a = j;
-                            b = i;
-                            category = 1;
-                            for (int k = b; k > a; k--)
+                            if (input.pointsOutput[i] % 2 == 1)
                             {
-                                clone[k] = clone[k - 1];
+                                for (int k = j; k < i; k++)
+                                {
+                                    if (input.w_points[k] - input.weights[input.pointsOutput[k]] + input.weights[input.pointsOutput[i]] > w)
+                                    {
+                                        // TODO false
+                                    }
+                                }
                             }
-                            clone[j] = input.pointsOutput[i];
+                            else
+                            {
+                                for (int k = j; k < i; k++)
+                                {
+                                    if (input.pointsOutput[k] == input.pointsOutput[i] + 1)
+                                    {
+                                        // TODO false
+                                    }
+                                }
+                            }
                         }
-                        double oldDis, newDis;
+                        double oldDis;
                         if (category == 1)
                         {
                             oldDis = input.distances[input.pointsOutput[a - 1]][input.pointsOutput[a]] + input.distances[input.pointsOutput[b]][input.pointsOutput[b + 1]] + input.distances[input.pointsOutput[b - 1]][input.pointsOutput[b]];
-
-                            newDis = input.distances[clone[a - 1]][clone[a]] + input.distances[clone[a]][clone[a + 1]] + input.distances[clone[b]][clone[b + 1]];
                         }
                         else
                         {
                             oldDis = input.distances[input.pointsOutput[a - 1]][input.pointsOutput[a]] + input.distances[input.pointsOutput[a]][input.pointsOutput[a + 1]] + input.distances[input.pointsOutput[b]][input.pointsOutput[b + 1]];
-                            newDis = input.distances[clone[a - 1]][clone[a]] + input.distances[clone[b]][clone[b + 1]] + input.distances[clone[b - 1]][clone[b]];
                         }
-
-                        if (checkRel(input, clone, a, b, category))
+                        if (checkRel(input, clone, a, b, c, category, oldDis))
                         {
-                            if (newDis < oldDis)
-                            {
-                                improved = true;
-                                Dis = input.totalDistance - oldDis + newDis;
-                                if (Dis < best_dis)
-                                {
-                                    best_dis = Dis;
-                                    best_clone = clone;
-                                }
-                            }
+                            // doi ban chinh bang ban sao
+                            input.pointsOutput = clone;
                         }
                     }
                 }
-            }
-            if (improved)
-            {
-                input.pointsOutput = best_clone;
-                input.totalDistance = best_dis;
             }
         }
     }
@@ -467,18 +499,18 @@ int main(int argc, char *agrv[])
     solution.nearestNeighbor(input);
     solution.totalDistance(input);
     output.totalDistance = input.totalDistance;
+
     output.pointsOutput = input.pointsOutput;
     output.showOutput();
     output.output("output/outputGen.csv");
 
-    solution.Swap(input);
-    output.pointsOutput = input.pointsOutput;
-    output.totalDistance = input.totalDistance;
-    output.showOutput();
+    // solution.Swap(input);
+    // output.pointsOutput = input.pointsOutput;
+    // output.totalDistance = input.totalDistance;
+    // output.showOutput();
 
     solution.Relocate(input);
     output.pointsOutput = input.pointsOutput;
-    output.totalDistance = input.totalDistance;
     output.showOutput();
 
     output.output("output/outputOp.csv");
