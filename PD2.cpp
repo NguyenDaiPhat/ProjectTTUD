@@ -305,7 +305,6 @@ struct Solution
                         double oldDis = input.distances[input.pointsOutput[i - 1]][input.pointsOutput[i]] + input.distances[input.pointsOutput[i]][input.pointsOutput[i + 1]] + input.distances[input.pointsOutput[j - 1]][input.pointsOutput[j]] + input.distances[input.pointsOutput[j]][input.pointsOutput[j + 1]];
 
                         double newDis = input.distances[clone[i - 1]][clone[i]] + input.distances[clone[i]][clone[i + 1]] + input.distances[clone[j - 1]][clone[j]] + input.distances[clone[j]][clone[j + 1]];
-
                         // if ban sao dung
                         if (checkSwap(input, clone, i, j))
                         {
@@ -474,7 +473,7 @@ int main(int argc, char *agrv[])
     solution.Swap(input);
     output.pointsOutput = input.pointsOutput;
     output.totalDistance = input.totalDistance;
-    output.showOutput();
+    // output.showOutput();
 
     solution.Relocate(input);
     output.pointsOutput = input.pointsOutput;
